@@ -123,6 +123,8 @@ def homepage():
     """
     Render the homepage template on the / route
     """
+    # Clean cookie moster
+    session.clear()
     # Load latest feed
     # Connect to a database with posts
     feed_table=""" CREATE TABLE IF NOT EXISTS posts (
@@ -242,7 +244,7 @@ def content(postid):
     Show a page with posted content
     """
     conn = create_connection("feed.db")
-    post=select_post(conn,postid)
+    post = select_post(conn,postid)
     return render_template('page/apps/app_page.html',post=post,title=str(postid))
 
 @home.route('/dashboard')
