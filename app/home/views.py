@@ -228,6 +228,16 @@ def clearsession():
     except Exception as e:
       return e
 
+@home.route('/session')
+def sessions():
+    """
+    Clear session cookies
+    """
+    try:
+      return str(session['sq'])
+    except Exception as e:
+      return str(e)
+
 @home.route('createcontent/<title>/<content>/<imageurl>')
 def createcontent(title,content,imageurl):
     """ 
