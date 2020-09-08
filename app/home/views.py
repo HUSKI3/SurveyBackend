@@ -8,7 +8,17 @@ from sqlite3 import Error
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
+import sys
+sys.path.append("..")
+from merrors import merrors
+import conf
 
+configs=conf.config()
+configs.read()
+name = configs.get("name")
+print(name)
+Merrors=merrors()
+Merrors.error("Test")
 
 #Form stuff
 class NewSurveyFormQuestions(FlaskForm):
@@ -194,6 +204,7 @@ def newsurvey():
 def newanswer():
   style = session['style'][0]
   print("style:",style)
+  # I liek to eat memory
   conn = create_connection("feed.db")
   if style == "s_text": 
     newform = NewSurveyFormAnswersText()
@@ -205,6 +216,7 @@ def newanswer():
     newform = NewSurveyFormAnswersNoAct()
   if newform.validate_on_submit():
     print("Saving data")
+    #Hold on, who aaareee you?
     if style == "s_text": 
       session['qs'] += [newform.answer.data]
     elif style == "radio":
@@ -223,20 +235,24 @@ def clearsession():
     Clear session cookies
     """
     try:
+      #cookie monster is sad
       session.clear()
       return "Success"
     except Exception as e:
-      return e
+      Merrors.error("Could not clean session. "+str(e))
+      return "MErrors caught the event, please check /merrors for info"
 
 @home.route('/session')
 def sessions():
     """
-    Clear session cookies
+    Check session cookies
     """
     try:
+      #cookie monster is happy
       return str(session['sq'])
     except Exception as e:
-      return str(e)
+      Merrors.error("Could not clean session. "+str(e))
+      return "MErrors caught the event, please check /merrors for info"
 
 @home.route('createcontent/<title>/<content>/<imageurl>')
 def createcontent(title,content,imageurl):
@@ -262,4 +278,14 @@ def dashboard():
     """
     Render the dashboard template on the /dashboard route
     """
+    #yes this is empty, no its not an accident. If it had something Earth would split.
     return render_template('page/home/dashboard.html', title="Dashboard")
+
+
+@home.route('/merrors')
+def merrors():
+    """
+    Render the merrors template on the /merrors route
+    """
+    errors = Merrors.getall()
+    return render_template('page/home/merrors.html',errors = errors,  title="MErrors")
